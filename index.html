@@ -191,7 +191,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="homework">homework <span class="quarto-category-count">(3)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(2)</span></div><div class="category" data-category="week 3">week 3 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="week 4">week 4 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="week 6">week 6 <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="homework">homework <span class="quarto-category-count">(5)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(2)</span></div><div class="category" data-category="week 3">week 3 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="week 4">week 4 <span class="quarto-category-count">(2)</span></div><div class="category" data-category="week 6">week 6 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="week 7">week 7 <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -205,7 +205,56 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="week 6,homework" data-listing-date-sort="1707897600000" data-listing-file-modified-sort="1708413132551" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="793">
+<div class="quarto-post image-right" data-index="0" data-categories="week 7,homework" data-listing-date-sort="1708502400000" data-listing-file-modified-sort="1708590577388" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="9">
+<div class="thumbnail">
+<p><a href="./posts/bruin/HW4/index.html" class="no-external"></a></p><a href="./posts/bruin/HW4/index.html" class="no-external">
+<p class="card-img-top"><img src="posts\bruin\HW4\index_files\figure-html\cell-3-output-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/bruin/HW4/index.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/bruin/HW4/index.html" class="no-external">HW4</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/bruin/HW4/index.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('week 7'); return false;">
+week 7
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('homework'); return false;">
+homework
+</div>
+</div>
+<div class="listing-description">
+<a href="./posts/bruin/HW4/index.html" class="no-external">
+
+<section id="matrix-multiplication" class="level2">
+
+<div id="1d0c24b1" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">N <span class="op">=</span> <span class="dv">101</span></span>
+<span id="cb1-2">epsilon <span class="op">=</span> <span class="fl">0.2</span></span></code></pre></div>
+</div>
+<div id="da84e180" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><span class="co"># construct initial condition: 1 unit of heat at midpoint. </span></span>
+<span id="cb2-4">u0 <span class="op">=</span> np.zeros((N, N))</span>
+<span id="cb2-5">u0[<span class="bu">int</span>(N<span class="op">…</span><span class="dv"></span><span class="bu"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="fl"></span></span><span id="cb2-6"></span></code></pre></div><div class="cell-output cell-output-display"><div><figure class="figure"><p></p></figure></div></div></div><div id="6af6e99f" class="cell" data-execution_count="4"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="kw"></span></span><span id="cb3-2"><span class="co"></span></span><span id="cb3-3"><span class="co"></span></span><span id="cb3-4"><span class="co"></span></span><span id="cb3-5"><span class="co"></span></span><span id="cb3-6"><span class="co"></span></span><span id="cb3-7"></span><span id="cb3-8"><span class="co"></span></span><span id="cb3-9"><span class="co"></span></span><span id="cb3-10"><span class="co"></span></span><span id="cb3-11"><span class="op"></span><span class="dv"></span></span><span id="cb3-12"><span class="op"></span><span class="op"></span><span class="op"></span><span class="op"></span></span><span id="cb3-13"><span class="cf"></span></span></code></pre></div></div><div id="7016d32d" class="cell" data-execution_count="5"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="op"></span><span class="op"></span></span><span id="cb4-2"><span class="op"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="op"></span></span><span id="cb4-3"><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span></span><span id="cb4-4"><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span></span><span id="cb4-5"><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span></span></code></pre></div></div><div id="78bd0b15" class="cell" data-execution_count="6"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="kw"></span></span><span id="cb5-2"><span class="co"></span></span><span id="cb5-3"><span class="co"></span></span><span id="cb5-4"><span class="op"></span><span class="op"></span></span><span id="cb5-5"><span class="op"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="op"></span></span><span id="cb5-6"><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span></span><span id="cb5-7"><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span></span><span id="cb5-8"><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span><span class="dv"></span><span class="op"></span></span><span id="cb5-9"><span class="cf"></span></span></code></pre></div></div><div id="675ec663" class="cell" data-execution_count="7"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="dv"></span></span></code></pre></div><div class="cell-output cell-output-error"><pre><code></code></pre></div></div></section><section id="sparse-matrix-in-jax" class="level2"></section></a>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/bruin/HW4/index.html" class="no-external">
+<div class="listing-date">
+Feb 21, 2024
+</div>
+<div class="listing-author">
+Emily Shi
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="week 6,homework" data-listing-date-sort="1707897600000" data-listing-file-modified-sort="1708585072181" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="793">
 <div class="thumbnail">
 <p><a href="./posts/bruin/HW3/index.html" class="no-external"></a></p><a href="./posts/bruin/HW3/index.html" class="no-external">
 <p class="card-img-top"><img src="posts\bruin\HW3\index_files\figure-html\9e5aa244-1-mainpage.png"  class="thumbnail-image card-img"/></p>
@@ -241,18 +290,18 @@ Emily Shi
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="week 4,homework" data-listing-date-sort="1707724800000" data-listing-file-modified-sort="1707787933075" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1078">
+<div class="quarto-post image-right" data-index="2" data-categories="week 4,homework" data-listing-date-sort="1707724800000" data-listing-file-modified-sort="1708593924236" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="830">
 <div class="thumbnail">
-<p><a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external"></a></p><a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external">
+<p><a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external"></a></p><a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external">
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external"></a></p>
+</a><p><a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external">HW2</a>
+<a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external">HW2</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external"></a>
+<a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('week 4'); return false;">
@@ -263,11 +312,11 @@ homework
 </div>
 </div>
 <div class="listing-description">
-<a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external">This activity aims to find the works of actors in a certain movie only under a specific category: “Acting.” Some actors may also hold other positions on other teams, such as…</a>
+<a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external">This activity aims to find the works of actors in a certain movie only under a specific category: “Acting.” Some actors may also hold other positions on other teams, such as…</a>
 </div>
 </div>
 <div class="metadata">
-<a href="./posts/bruin/HW2/tmdb_spider.html" class="no-external">
+<a href="./posts/bruin/HW2_copy/tmdb_spider-Copy1.html" class="no-external">
 <div class="listing-date">
 Feb 12, 2024
 </div>
@@ -277,7 +326,43 @@ Emily Shi
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="news,code,analysis" data-listing-date-sort="1707120000000" data-listing-file-modified-sort="1707169753708" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="7">
+<div class="quarto-post image-right" data-index="3" data-categories="week 4,homework" data-listing-date-sort="1707724800000" data-listing-file-modified-sort="1708593966468" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="833">
+<div class="thumbnail">
+<p><a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external"></a></p><a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external">HW2</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('week 4'); return false;">
+week 4
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('homework'); return false;">
+homework
+</div>
+</div>
+<div class="listing-description">
+<a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external">This activity aims to find the works of actors in a certain movie only under a specific category: “Acting.” Some actors may also hold other positions on other teams, such as…</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/bruin/HW2_copy/Untitled.html" class="no-external">
+<div class="listing-date">
+Feb 12, 2024
+</div>
+<div class="listing-author">
+Emily Shi
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="news,code,analysis" data-listing-date-sort="1707120000000" data-listing-file-modified-sort="1707169753708" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="7">
 <div class="thumbnail">
 <p><a href="./posts/post-with-code/index.html" class="no-external"></a></p><a href="./posts/post-with-code/index.html" class="no-external">
 <p><img src="./posts/post-with-code/image.jpg" class="thumbnail-image"></p>
@@ -316,7 +401,7 @@ Harlow Malloc
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="news" data-listing-date-sort="1706860800000" data-listing-file-modified-sort="1707169753699" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="32">
+<div class="quarto-post image-right" data-index="5" data-categories="news" data-listing-date-sort="1706860800000" data-listing-file-modified-sort="1707169753699" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="32">
 <div class="thumbnail">
 <p><a href="./posts/welcome/index.html" class="no-external"></a></p><a href="./posts/welcome/index.html" class="no-external">
 <p class="card-img-top"><img src="posts\welcome\thumbnail.jpg"  class="thumbnail-image card-img"/></p>
@@ -349,7 +434,7 @@ Tristan O’Malley
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="week 3,homework" data-listing-date-sort="1706515200000" data-listing-file-modified-sort="1707177894349" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1249">
+<div class="quarto-post image-right" data-index="6" data-categories="week 3,homework" data-listing-date-sort="1706515200000" data-listing-file-modified-sort="1707177894349" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1249">
 <div class="thumbnail">
 <p><a href="./posts/bruin/HW1/index.html" class="no-external"></a></p><a href="./posts/bruin/HW1/index.html" class="no-external">
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
