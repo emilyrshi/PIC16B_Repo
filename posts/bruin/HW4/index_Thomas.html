@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.542">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Thomas Nguyen">
+<meta name="dcterms.date" content="2024-02-23">
+
+<title>emilyBlog - Homework 4: Matrix Multiplication and Jax Numpy (Heat Diffusion)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">emilyBlog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Homework 4: Matrix Multiplication and Jax Numpy (Heat Diffusion)</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">week 7</div>
+                <div class="quarto-category">homework</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Thomas Nguyen </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">February 23, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>In this blog post, we will be going over how to use numpy arrays as well as comparing special tools to work with linear algebra. For our example, we will be conducting a simulation of two-dimensional heat diffusion maps.</p>
+<p>Because we will be working with numpy as well as data visualization, we will need to import both <code>numpy</code> as well as <code>pyplot</code>.</p>
+<div id="cell-3" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For our 2D-heat diffusion maps, we will be using the following parameters:</p>
+<div id="cell-5" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">101</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>iters <span class="op">=</span> <span class="dv">2700</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here, our <code>N</code> represents the size of our array (meaning there will be N^2 values in our array) <code>epsilon</code> represents the “heaviness / stability” of each of our update, and <code>iters</code> represents the amount of iterations our simulation will run.</p>
+<p>First, we will need to create an an initial heatmap to iterate and update upon. We can create an initial <code>N</code> x <code>N</code> empty grid with a singular unit of heat at the center with the following line of code:</p>
+<div id="cell-8" class="cell" data-outputid="ec583ef1-9cd0-44e5-e754-d26a34c9263b">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>u0 <span class="op">=</span> np.zeros((N, N))              <span class="co"># Creating NxN numpy array with entries of 0</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>u0[<span class="bu">int</span>(N<span class="op">/</span><span class="dv">2</span>), <span class="bu">int</span>(N<span class="op">/</span><span class="dv">2</span>)] <span class="op">=</span> <span class="fl">1.0</span>       <span class="co"># Assigning the midpoint value of initial array to 1</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.imshow(u0)                     <span class="co"># Plotting numpy array with the 1 unit of heat at midpoint</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_Thomas_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Great! Now that we have our initical condition heatmap, we can using different methods to update it.</p>
+<section id="matrix-multiplication" class="level1">
+<h1>Matrix Multiplication</h1>
+<p>The first method we will use is matrix multiplication. Essentially, we want to construct an updating matrix <code>A</code> that will act upon the flattened version of <code>u</code> which will be iterated and updated each time.</p>
+<p>Thus, the first function we want to create is for constructing our update matrix A (this matrix is called a finite difference matrix). We want our update in discrete time to be represented by the following function:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data:image/png;base64,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" class="img-fluid figure-img"></p>
+<figcaption>Screenshot 2024-02-23 1.31.17 PM.png</figcaption>
+</figure>
+</div>
+<p>Thus, we want our updating matrix <code>A</code> to represent the paranthesis part that is multiplied to <code>epsilon</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data:image/png;base64,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" class="img-fluid figure-img"></p>
+<figcaption>Screenshot 2024-02-23 1.30.29 PM.png</figcaption>
+</figure>
+</div>
+<p>Here, each u will represent a diagonal in our matrix: * u[i+1][j]: represents nth upper diagonal * u[i-1][j]: represents nth lower diagonal * u[i][j+1]: represents 1st upper diagonal * u[i][j-1]: represents 1st lower diagonal * u[i][j]: main diagonal</p>
+<p>With this information, we can now create our function to account for the desired grid size <code>N</code>, which should look something like this:</p>
+<div id="cell-18" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import inspect</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># from heat_equation import get_A</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(inspect.getsource(get_A))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-19" class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_A(N):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Creates a 2D finite difference matrix by adjusting the diagonal entries</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">  Args:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">       N: Integer representing size of desired matrix</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">  Returns:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">       N x N adjusting matrix.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">  """</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Getting total number of grid points</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  n <span class="op">=</span> N <span class="op">*</span> N</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating list with representative diagonals</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  diagonals <span class="op">=</span> [<span class="op">-</span><span class="dv">4</span> <span class="op">*</span> np.ones(n), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span><span class="dv">1</span>), np.ones(n<span class="op">-</span>N), np.ones(n<span class="op">-</span>N)]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Adjusting diagonals to account periodic 0's</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  diagonals[<span class="dv">1</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  diagonals[<span class="dv">2</span>][(N<span class="op">-</span><span class="dv">1</span>)::N] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Constructing finite difference matrix</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  A <span class="op">=</span> np.diag(diagonals[<span class="dv">0</span>]) <span class="op">+</span> np.diag(diagonals[<span class="dv">1</span>], <span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">2</span>], <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span> np.diag(diagonals[<span class="dv">3</span>], N) <span class="op">+</span> np.diag(diagonals[<span class="dv">4</span>], <span class="op">-</span>N)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> A</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have our function, let’s see what our function looks like with a test value parameter. For simplicity, we will use 3.</p>
+<div id="cell-21" class="cell" data-outputid="676aff0d-8081-4d8b-e710-cdf500c8a4f3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>get_A(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>array([[-4.,  1.,  0.,  1.,  0.,  0.,  0.,  0.,  0.],
+       [ 1., -4.,  1.,  0.,  1.,  0.,  0.,  0.,  0.],
+       [ 0.,  1., -4.,  0.,  0.,  1.,  0.,  0.,  0.],
+       [ 1.,  0.,  0., -4.,  1.,  0.,  1.,  0.,  0.],
+       [ 0.,  1.,  0.,  1., -4.,  1.,  0.,  1.,  0.],
+       [ 0.,  0.,  1.,  0.,  1., -4.,  0.,  0.,  1.],
+       [ 0.,  0.,  0.,  1.,  0.,  0., -4.,  1.,  0.],
+       [ 0.,  0.,  0.,  0.,  1.,  0.,  1., -4.,  1.],
+       [ 0.,  0.,  0.,  0.,  0.,  1.,  0.,  1., -4.]])</code></pre>
+</div>
+</div>
+<p>Our code outputted the matrix that we were looking for. Now, we can start on our next step: updating <code>u</code>.</p>
+<p>To match the discrete time update equation, we want to take into account 3 parameters: our update matrix <code>A</code>, the iterated matrix <code>u</code>, and our “scaling/stability” value <code>epsilon</code>. Because we already have all the components of the equation. We can just type out the equation in our function. So our function should look something like this:</p>
+<div id="cell-24" class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from heat_equation import advance_time_matvecmul</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># import inspect</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(inspect.getsource(advance_time_matvecmul))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-25" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_matvecmul(A, u, epsilon):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Advances the simulation by one timestep, via matrix-vector multiplication</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">        A: The 2d finite difference matrix, N^2 x N^2.</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">        u: N x N grid state at timestep k.</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">        epsilon: stability constant.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">        N x N Grid state at timestep k+1.</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> u.shape[<span class="dv">0</span>]                                        <span class="co"># Calculating size of grid</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> u <span class="op">+</span> epsilon <span class="op">*</span> (A <span class="op">@</span> u.flatten()).reshape((N, N))   <span class="co"># Flattening 2D grid 'u', Matrix mult. with</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                                                          <span class="co"># A, Reshaping back to original grade shape,</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                                                          <span class="co"># Updating 'u' with matrix multiplication + epsilon</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With both of these equations, we can now run our iterations.</p>
+<p>First, because we are comparing different methods for creating identical heatmaps, we want to import <code>time</code> in order to see execution time.</p>
+<div id="cell-28" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we want to create each of our variable in order to be able to use the <code>advance_time_matvecmul</code> function. We already have <code>epsilon</code> established earlier, so we just need <code>A</code> and <code>u</code>. Because we want to see the development of the grid with each update, we want to create a list to append the <code>u</code> at different iterations. <img src="data:image/png;base64,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" class="img-fluid" alt="Screenshot 2024-02-23 4.41.22 PM.png">Thus, we will use the following block of code:</p>
+<div id="cell-30" class="cell" data-outputid="cd7f343a-823f-480d-c2a1-92d7b90e5edc">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> get_A(N)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> u0</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>u_array <span class="op">=</span> []</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Starting execution time for iterations</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.time()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,iters<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  u <span class="op">=</span> advance_time_matvecmul(A, u, epsilon)             <span class="co"># Updating our heatmap grid</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> i <span class="op">%</span> <span class="dv">300</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    u_array.append(u.copy())                            <span class="co"># Appending every 300-th heatmap grid</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculating iteration time</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>execution_time <span class="op">=</span> time.time() <span class="op">-</span> start_time</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Execution Time is "</span>, execution_time, <span class="st">" seconds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Execution Time is  233.45097470283508  seconds</code></pre>
+</div>
+</div>
+<p>This approach took quite a long time, taking almost 4 minutes to go through 2700 iterations.</p>
+<p>Also note that through the conditional statement, we only appended 9 versions of <code>u</code>. With this appended list, we can now visualize the diffusion heatmaps. Because we have 9 grids, we can do 3x3 subplots by using <code>pyplot</code> through the following block of code:</p>
+<div id="cell-33" class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> diffusion_visualization(<span class="bu">list</span>):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Generating a visualization of the 9 developed heatmap grids</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">  Args:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">      list: list of appended heatmap grids</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">  Returns:</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">      3 rows, 3 columns of subplots of the heatmap grids</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">  """</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Generating base subplots</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  fig, ax <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">3</span>, figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">12</span>))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating indexing counter for list</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Looping through row</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Looping through column</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Plotting/Showing the nth item in the list</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>      ax[i][j].imshow(<span class="bu">list</span>[count])</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Setting title of the nth item in the list</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>      ax[i][j].set_title(<span class="ss">f"</span><span class="sc">{</span>(count<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">300</span><span class="sc">}</span><span class="ss">th iteration"</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Iterator</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>      count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  plt.tight_layout()</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Great! Now that we have our diffusion heat visualization function, let’s run it using our list of wanted iterations.</p>
+<div id="cell-35" class="cell" data-outputid="5b4fa050-ebb9-4f57-806e-afb0a73478e8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>diffusion_visualization(u_array)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_Thomas_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice that as more iterations occur, the heatmap develops, becoming more vibrant with the circles getting wider (exactly what we want).</p>
+</section>
+<section id="sparse-matrix-in-jax" class="level1">
+<h1>Sparse Matrix in JAX</h1>
+<p>Now that we have our initial method down, let’s use another method to increase computational time. For this one, we will use sparse matrices from JAX, a Python library designed for high-performance numerical computing.</p>
+<p>So first, we need to import the following:</p>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax.experimental <span class="im">import</span> sparse           <span class="co"># Allowing us to create sparse matrices</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> jax.numpy <span class="im">as</span> jnp                       <span class="co"># Allowing us to utilize jax numpy</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jax <span class="im">import</span> jit                           <span class="co"># Allowing us to use Just-In-Time compilations</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                                              <span class="co"># to execute JAX function effectively</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The next step we want to do is create a function to output us a sparse matrix. Because we already have the function <code>get_A</code> to help us output a finite difference matrix, we can use call <code>get_A</code> in this function to create the array <code>A</code>, which we will then turn into a JAX numpy sparse array. We can do that with the following block of code:</p>
+<div id="cell-42" class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from heat_equation import get_sparse_A</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># import inspect</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(inspect.getsource(get_sparse_A))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-43" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_sparse_A(N):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">""" Advancing simulation through BCOO (JAX batched coordimate)</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">  to create sparse updating matrix</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">  Args:</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">    N: size of array</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">  Returns:</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">    an N x N sparse updating matrix</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">  """</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating updating matrix</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  A <span class="op">=</span> get_A(N)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Transforming A into JAX numpy array</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  jnp_A <span class="op">=</span> jnp.array(A)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Converting into sparse matrix</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  A_sp_matrix <span class="op">=</span> sparse.BCOO.fromdense(jnp_A)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> A_sp_matrix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have our new sparse matrix, we can repeat the process of iteration and visualization. However, we also want to use the <code>jit</code>-ed version of <code>advance_time_matvecmul</code> to execute the JAX numpys for effectively. Thus our code should look something like this:</p>
+<div id="cell-45" class="cell" data-outputid="a7759290-1ac8-472c-8fca-1abfdf43d5b1">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Getting elements for advance_time function and iteration for loop</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>A_sp_matrix <span class="op">=</span> get_sparse_A(N)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> u0</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>u_array_sparse <span class="op">=</span> []</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Using JIT compilation for advance_time function</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>jitted_advance_time_matvecmul <span class="op">=</span> jax.jit(advance_time_matvecmul)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.time()</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,iters<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  u <span class="op">=</span> jitted_advance_time_matvecmul(A_sp_matrix, u, epsilon)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> i <span class="op">%</span> <span class="dv">300</span> <span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    u_array_sparse.append(u.copy())</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>execution_time <span class="op">=</span> time.time() <span class="op">-</span> start_time</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Execution Time is "</span>, execution_time, <span class="st">" seconds"</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>diffusion_visualization(u_array_sparse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Execution Time is  1.3260242938995361  seconds</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_Thomas_files/figure-html/cell-17-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice that this function is MUCH faster than the first process! It took only 1.33 seconds.</p>
+</section>
+<section id="direct-operation-with-numpy" class="level1">
+<h1>Direct Operation with Numpy</h1>
+<p>For this method, rather than relying on an updating matrix, we can update matrix <code>u</code> itself by using <code>numpy</code>’s vectorized array operations.</p>
+<p>Therefore, we will create an updated version of <code>advance_time_vatmecmul</code> that only needs two parameters: <code>u</code> and <code>epsilon</code>.</p>
+<p>Again, we want our function to execute the updating equation above. Except this time. Rather than writing a matrix to represent the paranthetical part. we can use numpy to represent each u[i+1][j], u[i-1][j], u[i][j+1], u[i][j-1].</p>
+<p>We can do this with using np.roll(), where we shift each of the points either left/right or up/down, depending on which we need. However, an important factor of <code>np.roll()</code> that we need to know is that it also takes the last point in the array and makes it the first and vice versa, which we don’t want. Thus we need to pad our array with 0 along the edge to prevent this. Thus our code should look something like this:</p>
+<div id="cell-52" class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from heat_equation import advance_time_numpy</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># import inspect</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(inspect.getsource(advance_time_numpy))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-53" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_numpy(u, epsilon):</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Advances the simulation by one timestep, via numpy rolling</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">        u: N x N grid state at timestep k.</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">        epsilon: stability constant.</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">        N x N Grid state at timestep k+1.</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">  """</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating padded version of u with 0's along edge</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  padded_u <span class="op">=</span> np.pad(u, <span class="dv">1</span>, mode <span class="op">=</span> <span class="st">'constant'</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating rolled version of padded u</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  right_roll <span class="op">=</span> np.roll(padded_u, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  left_roll <span class="op">=</span> np.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  up_roll <span class="op">=</span> np.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  down_roll <span class="op">=</span> np.roll(padded_u, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Updating u</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  numpy_u <span class="op">=</span> padded_u <span class="op">+</span> epsilon<span class="op">*</span>(right_roll <span class="op">+</span> left_roll <span class="op">+</span> up_roll <span class="op">+</span> down_roll <span class="op">-</span> (<span class="dv">4</span><span class="op">*</span>padded_u))</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Removing the 0's on the edge</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  numpy_u_sliced <span class="op">=</span> numpy_u[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> numpy_u_sliced</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice that before returning the updated <code>u</code>, we used sliced indexing because the padded u is a (N+2) x (N+2) array, but we only want a N x N array.</p>
+<p>With this function, we can again run our iterations and visualization and see how long this takes.</p>
+<div id="cell-56" class="cell" data-outputid="f49bcabf-77de-4675-a652-99b376da7151">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>numpy_u <span class="op">=</span> u0</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>results_numpy <span class="op">=</span> []</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.time()</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,iters<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  numpy_u <span class="op">=</span> advance_time_numpy(numpy_u, epsilon)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> i <span class="op">%</span> <span class="dv">300</span> <span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    results_numpy.append(numpy_u.copy())</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>execution_time <span class="op">=</span> time.time() <span class="op">-</span> start_time</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Execution Time is "</span>, execution_time, <span class="st">" seconds"</span>)</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>diffusion_visualization(results_numpy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Execution Time is  0.522552490234375  seconds</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_Thomas_files/figure-html/cell-20-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This time, it only takes 0.52 seconds, 2.3 times as fast!</p>
+</section>
+<section id="jax" class="level1">
+<h1>JAX</h1>
+<p>The last method we will use is <code>jax</code>, similar to when we did sparse matrix, we will do an jax version of the previous function, which will allow us to use just-in-time compilation. Benefit of this method as well is that we will not need to rely on (sparse) matrix multiplication.</p>
+<p>Everything will be the same as <code>advance_time_numpy</code>, but we just replace all the numpy with jax.numpy, or <code>jnp</code>. Thus we should get the following code:</p>
+<div id="cell-61" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from heat_equation import advance_time_jax</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># import inspect</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(inspect.getsource(advance_time_jax))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-62" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> advance_time_jax(u, epsilon):</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Advances the simulation by one timestep, via jax numpy rolling</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">  Args:</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">      u: N x N grid state at timestep k.</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">      epsilon: stability constant.</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">  Returns:</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">      N x N Grid state at timestep k+1.</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">  """</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating padded version of u with 0's along edge</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  padded_u <span class="op">=</span> jnp.pad(u, <span class="dv">1</span>, mode <span class="op">=</span> <span class="st">'constant'</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creating rolled version of padded u</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  right_roll <span class="op">=</span> jnp.roll(padded_u, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  left_roll <span class="op">=</span> jnp.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  up_roll <span class="op">=</span> jnp.roll(padded_u, <span class="op">-</span><span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  down_roll <span class="op">=</span> jnp.roll(padded_u, <span class="dv">1</span>, axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Updating u</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  jnp_u <span class="op">=</span> padded_u <span class="op">+</span> epsilon<span class="op">*</span>(right_roll <span class="op">+</span> left_roll <span class="op">+</span> up_roll <span class="op">+</span> down_roll <span class="op">-</span> (<span class="dv">4</span><span class="op">*</span>padded_u))</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Removing the 0's on the edge</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  jnp_u_sliced <span class="op">=</span> jnp_u[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> jnp_u_sliced</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For one last time, we will run our iteration and visualization. Because we are dealing with jax numpy again, we will use the <code>jit</code>-ed version of <code>advance_time_jax</code>.</p>
+<div id="cell-64" class="cell" data-outputid="a71a8578-3029-4b7a-d056-aa52abf7bfc3">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>jitted_jax <span class="op">=</span> jax.jit(advance_time_jax)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>jnp_u <span class="op">=</span> u0</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>results_jnp <span class="op">=</span> []</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.time()</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>,iters<span class="op">+</span><span class="dv">1</span>):</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  jnp_u <span class="op">=</span> jitted_jax(jnp_u, epsilon)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> i <span class="op">%</span> <span class="dv">300</span> <span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    results_jnp.append(jnp_u.copy())</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>execution_time <span class="op">=</span> time.time() <span class="op">-</span> start_time</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Execution Time is "</span>, execution_time, <span class="st">" seconds"</span>)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>diffusion_visualization(results_jnp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Execution Time is  0.08782696723937988  seconds</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_Thomas_files/figure-html/cell-23-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This one is the fastest of them all, taking 0.09 seconds, more than 5 times as fast as the previous one!</p>
+</section>
+<section id="comparison" class="level1">
+<h1>Comparison</h1>
+<p>Out of all of these, the fastest is of course with jax as it took only 0.09 seconds, followed by direct operation through numpy, then sparse matrix, and lastly direct matrix multiplication.</p>
+<p>Out of all of these, I think that direct operation through nunmpy was the easiest to write since it did not require me to write two functions, and I did not have to use an additional updating matrix, which got really complicated.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      return note.innerHTML;
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
